@@ -3,6 +3,8 @@ package com.roam.api.auth.service;
 import com.roam.api.auth.entity.EmailOtpChallenge;
 import com.roam.api.auth.entity.EmailOtpChallengeStatus;
 import com.roam.api.auth.repository.EmailOtpChallengeRepository;
+import com.roam.api.user.entity.User;
+import com.roam.api.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +25,8 @@ public class EmailOtpService {
     private final OtpHasher otpHasher;
     private final Clock clock;
 
+    private final UserService userService;
+
     @Transactional
     public String requestOtp(String email) {
         String normalizedEmail = normalizeEmail(email);
@@ -41,6 +45,38 @@ public class EmailOtpService {
 
         //temp for development
         return otpCode;
+    }
+
+    @Transactional(noRollbackFor = IllegalArgumentException.class)
+    public User verifyOtp(String email, String otpCode) {
+        String normalizedEmail = normalizeEmail(email);
+        Instant now = Instant.now(clock);
+
+        EmailOtpChallenge challenge = emailOtpChallengeRepository.findFirstByEmailAndStatusOrderByCreatedAtDesc(normalizedEmail, EmailOtpChallengeStatus.PENDING).orElseThrow(() -> new IllegalArgumentException("Invalid or expired OTP"));
+
+        if (challenge.isExpired(now)) {
+            challenge.expire();
+            throw new IllegalArgumentException("Invalid or expired OTP.");
+        }
+
+        if (challenge.hasNoAttemptsRemaining()) {
+            challenge.expire();
+            throw new IllegalArgumentException("Invalid or expired OTP.");
+        }
+
+        if (!otpHasher.matches(otpCode, challenge.getOtpHash())) {
+            challenge.recordFailedAttempt();
+
+            if (challenge.hasNoAttemptsRemaining()) {
+                challenge.expire();
+            }
+
+            throw new IllegalArgumentException("Invalid or expired OTP.");
+        }
+
+        challenge.consume(now);
+
+        return userService.findOrCreateAfterSuccessfulLogin(normalizedEmail);
     }
 
     private String normalizeEmail(String email) {

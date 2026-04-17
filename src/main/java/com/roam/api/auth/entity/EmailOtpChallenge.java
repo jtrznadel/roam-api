@@ -63,4 +63,26 @@ public class EmailOtpChallenge {
     public void revoke() {
         this.status = EmailOtpChallengeStatus.REVOKED;
     }
+
+    public boolean isExpired(Instant now) {
+        return !expiresAt.isAfter(now);
+    }
+
+    public boolean hasNoAttemptsRemaining() {
+        return attemptCount >= maxAttempts;
+    }
+
+    public void recordFailedAttempt() {
+        this.attemptCount++;
+    }
+
+    public void expire() {
+        this.status = EmailOtpChallengeStatus.EXPIRED;
+    }
+
+    public void consume(Instant now) {
+        this.status = EmailOtpChallengeStatus.CONSUMED;
+        this.verifiedAt = now;
+        this.consumedAt = now;
+    }
 }

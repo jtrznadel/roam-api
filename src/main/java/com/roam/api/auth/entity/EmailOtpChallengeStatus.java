@@ -4,5 +4,6 @@ public enum EmailOtpChallengeStatus {
     PENDING,
     VERIFIED,
     EXPIRED,
-    CONSUMED
+    CONSUMED,
+    REVOKED
 }

@@ -2,9 +2,9 @@ package com.roam.api.user.service;
 
 import com.roam.api.user.entity.User;
 import com.roam.api.user.repository.UserRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
 import java.time.Instant;

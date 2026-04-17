@@ -59,4 +59,8 @@ public class EmailOtpChallenge {
         challenge.createdAt = now;
         return challenge;
     }
+
+    public void revoke() {
+        this.status = EmailOtpChallengeStatus.REVOKED;
+    }
 }

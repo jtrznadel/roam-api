@@ -38,4 +38,20 @@ public class User {
 
     @Column(name = "deleted_at")
     private Instant deletedAd;
+
+    public static User create(String email, Instant now) {
+        User user = new User();
+        user.id = UUID.randomUUID();
+        user.email = email;
+        user.status = UserStatus.ACTIVE;
+        user.emailVerifiedAt = now;
+        user.createdAt = now;
+        user.updatedAt = now;
+        return user;
+    }
+
+    public void recordLogin(Instant now) {
+        this.lastLoginAt = now;
+        this.updatedAt = now;
+    }
 }

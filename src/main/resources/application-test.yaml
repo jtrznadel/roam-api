@@ -1,0 +1,19 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://${ROAM_TEST_DB_HOST:localhost}:${ROAM_TEST_DB_PORT:5432}/${ROAM_TEST_DB_NAME:roam_test}
+    username: ${ROAM_TEST_DB_USERNAME:roam}
+    password: ${ROAM_TEST_DB_PASSWORD:roam}
+  jpa:
+    properties:
+      hibernate:
+        format_sql: false
+
+logging:
+  level:
+    org.hibernate.SQL: warn
+    org.springframework.security: warn
+
+management:
+  endpoint:
+    health:
+      show-details: never

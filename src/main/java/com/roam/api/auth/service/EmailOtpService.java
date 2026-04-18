@@ -2,6 +2,7 @@ package com.roam.api.auth.service;
 
 import com.roam.api.auth.entity.EmailOtpChallenge;
 import com.roam.api.auth.entity.EmailOtpChallengeStatus;
+import com.roam.api.auth.exception.InvalidOtpException;
 import com.roam.api.auth.repository.EmailOtpChallengeRepository;
 import com.roam.api.user.entity.User;
 import com.roam.api.user.service.UserService;
@@ -47,7 +48,7 @@ public class EmailOtpService {
         return otpCode;
     }
 
-    @Transactional(noRollbackFor = IllegalArgumentException.class)
+    @Transactional(noRollbackFor = InvalidOtpException.class)
     public User verifyOtp(String email, String otpCode) {
         String normalizedEmail = normalizeEmail(email);
         Instant now = Instant.now(clock);
@@ -56,12 +57,13 @@ public class EmailOtpService {
 
         if (challenge.isExpired(now)) {
             challenge.expire();
-            throw new IllegalArgumentException("Invalid or expired OTP.");
+            throw new InvalidOtpException();
+
         }
 
         if (challenge.hasNoAttemptsRemaining()) {
             challenge.expire();
-            throw new IllegalArgumentException("Invalid or expired OTP.");
+            throw new InvalidOtpException();
         }
 
         if (!otpHasher.matches(otpCode, challenge.getOtpHash())) {
@@ -71,7 +73,8 @@ public class EmailOtpService {
                 challenge.expire();
             }
 
-            throw new IllegalArgumentException("Invalid or expired OTP.");
+            throw new InvalidOtpException();
+
         }
 
         challenge.consume(now);

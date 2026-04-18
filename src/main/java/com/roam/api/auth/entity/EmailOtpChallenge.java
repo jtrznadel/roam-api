@@ -85,4 +85,8 @@ public class EmailOtpChallenge {
         this.verifiedAt = now;
         this.consumedAt = now;
     }
+
+    public boolean wasCreatedAfter(Instant time) {
+        return createdAt.isAfter(time);
+    }
 }

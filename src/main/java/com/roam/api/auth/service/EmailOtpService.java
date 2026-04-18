@@ -3,6 +3,7 @@ package com.roam.api.auth.service;
 import com.roam.api.auth.entity.EmailOtpChallenge;
 import com.roam.api.auth.entity.EmailOtpChallengeStatus;
 import com.roam.api.auth.exception.InvalidOtpException;
+import com.roam.api.auth.exception.OtpResendTooSoonException;
 import com.roam.api.auth.repository.EmailOtpChallengeRepository;
 import com.roam.api.user.entity.User;
 import com.roam.api.user.service.UserService;
@@ -20,6 +21,7 @@ import java.util.Locale;
 public class EmailOtpService {
     private static final int OTP_TTL_MINUTES = 10;
     private static final int OTP_MAX_ATTEMPTS = 5;
+    private static final int OTP_RESEND_COOLDOWN_SECONDS = 60;
 
     private final EmailOtpChallengeRepository emailOtpChallengeRepository;
     private final OtpCodeGenerator otpCodeGenerator;
@@ -33,6 +35,8 @@ public class EmailOtpService {
         String normalizedEmail = normalizeEmail(email);
         Instant now = Instant.now(clock);
         Instant expiresAt = now.plus(OTP_TTL_MINUTES, ChronoUnit.MINUTES);
+
+        ensureResendAllowed(email, now);
 
         emailOtpChallengeRepository.findAllByEmailAndStatus(normalizedEmail, EmailOtpChallengeStatus.PENDING)
                 .forEach(EmailOtpChallenge::revoke);
@@ -80,6 +84,16 @@ public class EmailOtpService {
         challenge.consume(now);
 
         return userService.findOrCreateAfterSuccessfulLogin(normalizedEmail);
+    }
+
+    private void ensureResendAllowed(String email, Instant now) {
+        Instant cooldownThreshold = now.minus(OTP_RESEND_COOLDOWN_SECONDS, ChronoUnit.SECONDS);
+
+        emailOtpChallengeRepository.findFirstByEmailOrderByCreatedAtDesc(email)
+                .filter(challenge -> challenge.wasCreatedAfter(cooldownThreshold))
+                .ifPresent(challenge -> {
+                    throw new OtpResendTooSoonException();
+                });
     }
 
     private String normalizeEmail(String email) {

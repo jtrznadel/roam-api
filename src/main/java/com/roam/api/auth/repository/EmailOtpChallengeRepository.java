@@ -19,4 +19,6 @@ public interface EmailOtpChallengeRepository extends JpaRepository<EmailOtpChall
             String email,
             EmailOtpChallengeStatus status
     );
+
+    Optional<EmailOtpChallenge> findFirstByEmailOrderByCreatedAtDesc(String email);
 }

@@ -1,4 +1,4 @@
-package com.roam.api.auth.service;
+package com.roam.api.auth.otp;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;

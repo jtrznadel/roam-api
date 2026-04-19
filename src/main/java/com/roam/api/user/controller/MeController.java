@@ -1,4 +1,4 @@
-package com.roam.api.user.contoller;
+package com.roam.api.user.controller;
 
 import com.roam.api.security.CurrentUserPrincipal;
 import com.roam.api.user.dto.CurrentUserResponse;
@@ -15,7 +15,7 @@ public class MeController {
 
     private final UserService userService;
 
-    @GetMapping("api/v1/me")
+    @GetMapping("/api/v1/me")
     public CurrentUserResponse me(
             @AuthenticationPrincipal CurrentUserPrincipal currentUser
     ) {

@@ -2,8 +2,8 @@ package com.roam.api.auth.controller;
 
 import com.roam.api.auth.dto.*;
 import com.roam.api.auth.service.EmailOtpService;
-import com.roam.api.auth.service.IssuedRefreshToken;
 import com.roam.api.auth.service.RefreshTokenService;
+import com.roam.api.auth.token.IssuedRefreshToken;
 import com.roam.api.security.jwt.JwtService;
 import com.roam.api.user.entity.User;
 import jakarta.validation.Valid;
@@ -22,7 +22,7 @@ public class AuthController {
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
 
-    @PostMapping("api/v1/auth/email/otp/request")
+    @PostMapping("/api/v1/auth/email/otp/request")
     @ResponseStatus(HttpStatus.CREATED)
     public RequestEmailOtpResponse requestEmailOtp(
             @Valid @RequestBody RequestEmailOtpRequest request
@@ -34,7 +34,7 @@ public class AuthController {
         );
     }
 
-    @PostMapping("api/v1/auth/email/otp/verify")
+    @PostMapping("/api/v1/auth/email/otp/verify")
     public AuthTokensResponse verifyEmailOtp(
             @Valid @RequestBody VerifyEmailOtpRequest request
     ) {
@@ -56,7 +56,7 @@ public class AuthController {
         );
     }
 
-    @PostMapping("api/v1/auth/token/refresh")
+    @PostMapping("/api/v1/auth/token/refresh")
     public AuthTokensResponse refreshToken(
             @Valid @RequestBody RefreshTokenRequest request
     ) {
@@ -74,7 +74,7 @@ public class AuthController {
         );
     }
 
-    @PostMapping("api/v1/auth/logout")
+    @PostMapping("/api/v1/auth/logout")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void logout(
             @Valid @RequestBody RefreshTokenRequest request

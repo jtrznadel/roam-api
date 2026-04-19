@@ -1,4 +1,4 @@
-package com.roam.api.auth.service;
+package com.roam.api.auth.token;
 
 import org.springframework.stereotype.Component;
 

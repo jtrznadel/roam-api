@@ -8,9 +8,9 @@ import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
-import java.sql.Date;
 import java.time.Clock;
 import java.time.Instant;
+import java.util.Date;
 import java.util.UUID;
 
 @Service

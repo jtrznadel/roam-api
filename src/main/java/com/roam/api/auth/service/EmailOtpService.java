@@ -4,6 +4,8 @@ import com.roam.api.auth.entity.EmailOtpChallenge;
 import com.roam.api.auth.entity.EmailOtpChallengeStatus;
 import com.roam.api.auth.exception.InvalidOtpException;
 import com.roam.api.auth.exception.OtpResendTooSoonException;
+import com.roam.api.auth.otp.OtpCodeGenerator;
+import com.roam.api.auth.otp.OtpHasher;
 import com.roam.api.auth.repository.EmailOtpChallengeRepository;
 import com.roam.api.infrastructure.email.EmailSender;
 import com.roam.api.user.entity.User;

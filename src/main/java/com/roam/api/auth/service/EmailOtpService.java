@@ -5,6 +5,7 @@ import com.roam.api.auth.entity.EmailOtpChallengeStatus;
 import com.roam.api.auth.exception.InvalidOtpException;
 import com.roam.api.auth.exception.OtpResendTooSoonException;
 import com.roam.api.auth.repository.EmailOtpChallengeRepository;
+import com.roam.api.infrastructure.email.EmailSender;
 import com.roam.api.user.entity.User;
 import com.roam.api.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -26,17 +27,19 @@ public class EmailOtpService {
     private final EmailOtpChallengeRepository emailOtpChallengeRepository;
     private final OtpCodeGenerator otpCodeGenerator;
     private final OtpHasher otpHasher;
+    private final EmailSender emailSender;
+
     private final Clock clock;
 
     private final UserService userService;
 
     @Transactional
-    public String requestOtp(String email) {
+    public void requestOtp(String email) {
         String normalizedEmail = normalizeEmail(email);
         Instant now = Instant.now(clock);
         Instant expiresAt = now.plus(OTP_TTL_MINUTES, ChronoUnit.MINUTES);
 
-        ensureResendAllowed(email, now);
+        ensureResendAllowed(normalizedEmail, now);
 
         emailOtpChallengeRepository.findAllByEmailAndStatus(normalizedEmail, EmailOtpChallengeStatus.PENDING)
                 .forEach(EmailOtpChallenge::revoke);
@@ -48,8 +51,7 @@ public class EmailOtpService {
 
         emailOtpChallengeRepository.save(challenge);
 
-        //temp for development
-        return otpCode;
+        emailSender.sendOtpCode(normalizedEmail, otpCode);
     }
 
     @Transactional(noRollbackFor = InvalidOtpException.class)

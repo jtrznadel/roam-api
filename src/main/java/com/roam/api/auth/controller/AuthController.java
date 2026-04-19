@@ -27,11 +27,10 @@ public class AuthController {
     public RequestEmailOtpResponse requestEmailOtp(
             @Valid @RequestBody RequestEmailOtpRequest request
     ) {
-        String otpCode = emailOtpService.requestOtp(request.email());
+        emailOtpService.requestOtp(request.email());
 
         return new RequestEmailOtpResponse(
-                "Verification code sent.",
-                otpCode
+                "Verification code sent."
         );
     }
 

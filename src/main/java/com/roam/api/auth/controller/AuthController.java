@@ -17,11 +17,14 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/api/v1/auth/email/otp/request")
-    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(HttpStatus.ACCEPTED)
     public RequestEmailOtpResponse requestEmailOtp(
             @Valid @RequestBody RequestEmailOtpRequest request
     ) {
-        return authService.requestEmailOtp(request.email());
+        authService.requestEmailOtp(request.email());
+
+        return new RequestEmailOtpResponse("Verification code sent.");
+
     }
 
     @PostMapping("/api/v1/auth/email/otp/verify")

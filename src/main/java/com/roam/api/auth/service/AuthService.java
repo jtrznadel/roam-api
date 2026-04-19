@@ -1,7 +1,6 @@
 package com.roam.api.auth.service;
 
 import com.roam.api.auth.dto.AuthTokensResponse;
-import com.roam.api.auth.dto.RequestEmailOtpResponse;
 import com.roam.api.auth.token.IssuedRefreshToken;
 import com.roam.api.security.jwt.JwtService;
 import com.roam.api.user.entity.User;
@@ -17,10 +16,8 @@ public class AuthService {
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
 
-    public RequestEmailOtpResponse requestEmailOtp(String email) {
+    public void requestEmailOtp(String email) {
         emailOtpService.requestOtp(email);
-
-        return new RequestEmailOtpResponse("Verification code sent.");
     }
 
     @Transactional

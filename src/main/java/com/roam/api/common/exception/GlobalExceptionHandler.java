@@ -1,12 +1,14 @@
 package com.roam.api.common.exception;
 
 import com.roam.api.common.response.ApiErrorResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -31,7 +33,9 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiErrorResponse> handleUnexpectedException() {
+    public ResponseEntity<ApiErrorResponse> handleUnexpectedException(Exception exception) {
+        log.error("Unexpected exception", exception);
+
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new ApiErrorResponse(
@@ -46,6 +50,7 @@ public class GlobalExceptionHandler {
             case INVALID_OTP, VALIDATION_FAILED -> HttpStatus.BAD_REQUEST;
             case INTERNAL_ERROR -> HttpStatus.INTERNAL_SERVER_ERROR;
             case OTP_RESEND_TOO_SOON -> HttpStatus.TOO_MANY_REQUESTS;
+            case INVALID_REFRESH_TOKEN -> HttpStatus.UNAUTHORIZED;
         };
     }
 }

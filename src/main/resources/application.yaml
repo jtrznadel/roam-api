@@ -20,3 +20,8 @@ management:
     health:
       probes:
         enabled: true
+        
+security:
+  jwt:
+    issuer: roam-api
+    access-token-ttl-seconds: 900

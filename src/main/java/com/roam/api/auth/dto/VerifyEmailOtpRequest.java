@@ -12,6 +12,10 @@ public record VerifyEmailOtpRequest(
 
         @NotBlank
         @Pattern(regexp = "\\d{6}")
-        String otpCode
+        String otpCode,
+
+        String deviceId,
+
+        String deviceName
 ) {
 }

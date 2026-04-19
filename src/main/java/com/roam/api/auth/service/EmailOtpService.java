@@ -57,7 +57,9 @@ public class EmailOtpService {
         String normalizedEmail = normalizeEmail(email);
         Instant now = Instant.now(clock);
 
-        EmailOtpChallenge challenge = emailOtpChallengeRepository.findFirstByEmailAndStatusOrderByCreatedAtDesc(normalizedEmail, EmailOtpChallengeStatus.PENDING).orElseThrow(() -> new IllegalArgumentException("Invalid or expired OTP"));
+        EmailOtpChallenge challenge = emailOtpChallengeRepository.findFirstByEmailAndStatusOrderByCreatedAtDesc(
+                        normalizedEmail, EmailOtpChallengeStatus.PENDING)
+                .orElseThrow(InvalidOtpException::new);
 
         if (challenge.isExpired(now)) {
             challenge.expire();

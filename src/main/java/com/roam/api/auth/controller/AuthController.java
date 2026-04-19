@@ -1,10 +1,10 @@
 package com.roam.api.auth.controller;
 
-import com.roam.api.auth.dto.RequestEmailOtpRequest;
-import com.roam.api.auth.dto.RequestEmailOtpResponse;
-import com.roam.api.auth.dto.VerifyEmailOtpRequest;
-import com.roam.api.auth.dto.VerifyEmailOtpResponse;
+import com.roam.api.auth.dto.*;
 import com.roam.api.auth.service.EmailOtpService;
+import com.roam.api.auth.service.IssuedRefreshToken;
+import com.roam.api.auth.service.RefreshTokenService;
+import com.roam.api.security.jwt.JwtService;
 import com.roam.api.user.entity.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final EmailOtpService emailOtpService;
+    private final JwtService jwtService;
+    private final RefreshTokenService refreshTokenService;
 
     @PostMapping("api/v1/auth/email/otp/request")
     @ResponseStatus(HttpStatus.CREATED)
@@ -34,11 +36,42 @@ public class AuthController {
     }
 
     @PostMapping("api/v1/auth/email/otp/verify")
-    public VerifyEmailOtpResponse verifyEmailOtp(
+    public AuthTokensResponse verifyEmailOtp(
             @Valid @RequestBody VerifyEmailOtpRequest request
     ) {
         User user = emailOtpService.verifyOtp(request.email(), request.otpCode());
 
-        return new VerifyEmailOtpResponse("Email verified", user.getId());
+        String accessToken = jwtService.generateAccessToken(user.getId());
+
+        IssuedRefreshToken issuedRefreshToken = refreshTokenService.issueToken(
+                user,
+                request.deviceId(),
+                request.deviceName()
+        );
+
+        return new AuthTokensResponse(
+                accessToken,
+                issuedRefreshToken.token(),
+                "Bearer",
+                jwtService.accessTokenTtlSeconds()
+        );
+    }
+
+    @PostMapping("api/v1/auth/token/refresh")
+    public AuthTokensResponse refreshToken(
+            @Valid @RequestBody RefreshTokenRequest request
+    ) {
+        IssuedRefreshToken issuedRefreshToken = refreshTokenService.rotateToken(request.refreshToken());
+
+        String accessToken = jwtService.generateAccessToken(
+                issuedRefreshToken.userId()
+        );
+
+        return new AuthTokensResponse(
+                accessToken,
+                issuedRefreshToken.token(),
+                "Bearer",
+                jwtService.accessTokenTtlSeconds()
+        );
     }
 }

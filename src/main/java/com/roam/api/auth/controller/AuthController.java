@@ -1,11 +1,7 @@
 package com.roam.api.auth.controller;
 
 import com.roam.api.auth.dto.*;
-import com.roam.api.auth.service.EmailOtpService;
-import com.roam.api.auth.service.RefreshTokenService;
-import com.roam.api.auth.token.IssuedRefreshToken;
-import com.roam.api.security.jwt.JwtService;
-import com.roam.api.user.entity.User;
+import com.roam.api.auth.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,41 +14,25 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final EmailOtpService emailOtpService;
-    private final JwtService jwtService;
-    private final RefreshTokenService refreshTokenService;
+    private final AuthService authService;
 
     @PostMapping("/api/v1/auth/email/otp/request")
     @ResponseStatus(HttpStatus.CREATED)
     public RequestEmailOtpResponse requestEmailOtp(
             @Valid @RequestBody RequestEmailOtpRequest request
     ) {
-        emailOtpService.requestOtp(request.email());
-
-        return new RequestEmailOtpResponse(
-                "Verification code sent."
-        );
+        return authService.requestEmailOtp(request.email());
     }
 
     @PostMapping("/api/v1/auth/email/otp/verify")
     public AuthTokensResponse verifyEmailOtp(
             @Valid @RequestBody VerifyEmailOtpRequest request
     ) {
-        User user = emailOtpService.verifyOtp(request.email(), request.otpCode());
-
-        String accessToken = jwtService.generateAccessToken(user.getId());
-
-        IssuedRefreshToken issuedRefreshToken = refreshTokenService.issueToken(
-                user,
+        return authService.verifyEmailOtp(
+                request.email(),
+                request.otpCode(),
                 request.deviceId(),
                 request.deviceName()
-        );
-
-        return new AuthTokensResponse(
-                accessToken,
-                issuedRefreshToken.token(),
-                "Bearer",
-                jwtService.accessTokenTtlSeconds()
         );
     }
 
@@ -60,18 +40,7 @@ public class AuthController {
     public AuthTokensResponse refreshToken(
             @Valid @RequestBody RefreshTokenRequest request
     ) {
-        IssuedRefreshToken issuedRefreshToken = refreshTokenService.rotateToken(request.refreshToken());
-
-        String accessToken = jwtService.generateAccessToken(
-                issuedRefreshToken.userId()
-        );
-
-        return new AuthTokensResponse(
-                accessToken,
-                issuedRefreshToken.token(),
-                "Bearer",
-                jwtService.accessTokenTtlSeconds()
-        );
+        return authService.refreshToken(request.refreshToken());
     }
 
     @PostMapping("/api/v1/auth/logout")
@@ -79,6 +48,6 @@ public class AuthController {
     public void logout(
             @Valid @RequestBody RefreshTokenRequest request
     ) {
-        refreshTokenService.revokeToken(request.refreshToken());
+        authService.logout(request.refreshToken());
     }
 }

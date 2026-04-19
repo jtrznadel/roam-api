@@ -74,4 +74,12 @@ public class AuthController {
                 jwtService.accessTokenTtlSeconds()
         );
     }
+
+    @PostMapping("api/v1/auth/logout")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void logout(
+            @Valid @RequestBody RefreshTokenRequest request
+    ) {
+        refreshTokenService.revokeToken(request.refreshToken());
+    }
 }

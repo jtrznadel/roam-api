@@ -6,4 +6,5 @@ public enum ErrorCode {
     INTERNAL_ERROR,
     OTP_RESEND_TOO_SOON,
     INVALID_REFRESH_TOKEN,
+    UNAUTHORIZED,
 }

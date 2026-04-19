@@ -50,7 +50,7 @@ public class GlobalExceptionHandler {
             case INVALID_OTP, VALIDATION_FAILED -> HttpStatus.BAD_REQUEST;
             case INTERNAL_ERROR -> HttpStatus.INTERNAL_SERVER_ERROR;
             case OTP_RESEND_TOO_SOON -> HttpStatus.TOO_MANY_REQUESTS;
-            case INVALID_REFRESH_TOKEN -> HttpStatus.UNAUTHORIZED;
+            case INVALID_REFRESH_TOKEN, UNAUTHORIZED -> HttpStatus.UNAUTHORIZED;
         };
     }
 }

@@ -93,4 +93,14 @@ public class RefreshTokenService {
 
         return new IssuedRefreshToken(replacement.token(), replacement.userId());
     }
+
+    @Transactional
+    public void revokeToken(String rawRefreshToken) {
+        String tokenHash = refreshTokenHasher.hash(rawRefreshToken);
+        Instant now = Instant.now(clock);
+
+        refreshTokenRepository.findByTokenHash(tokenHash)
+                .filter(RefreshToken::isActive)
+                .ifPresent(refreshToken -> refreshToken.revoke(now));
+    }
 }

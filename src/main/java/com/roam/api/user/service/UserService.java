@@ -1,6 +1,7 @@
 package com.roam.api.user.service;
 
 import com.roam.api.user.entity.User;
+import com.roam.api.user.exception.UserNotFoundException;
 import com.roam.api.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -9,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.Locale;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +28,12 @@ public class UserService {
                     user.recordLogin(now);
                     return user;
                 }).orElseGet(() -> userRepository.save(User.create(normalizedEmail, now)));
+    }
+
+    @Transactional(readOnly = true)
+    public User getById(UUID userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(UserNotFoundException::new);
     }
 
     private String normalizeEmail(String email) {

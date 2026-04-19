@@ -7,4 +7,5 @@ public enum ErrorCode {
     OTP_RESEND_TOO_SOON,
     INVALID_REFRESH_TOKEN,
     UNAUTHORIZED,
+    USER_NOT_FOUND,
 }

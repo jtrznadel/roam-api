@@ -1,25 +1,30 @@
 package com.roam.api.user.contoller;
 
 import com.roam.api.security.CurrentUserPrincipal;
+import com.roam.api.user.dto.CurrentUserResponse;
+import com.roam.api.user.entity.User;
+import com.roam.api.user.service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.UUID;
-
 @RestController
+@RequiredArgsConstructor
 public class MeController {
 
+    private final UserService userService;
+
     @GetMapping("api/v1/me")
-    public MeResponse me(
+    public CurrentUserResponse me(
             @AuthenticationPrincipal CurrentUserPrincipal currentUser
     ) {
-        return new MeResponse(currentUser.userId());
-    }
+        User user = userService.getById(currentUser.userId());
 
-    public record MeResponse(
-            UUID userId
-    ) {
-
+        return new CurrentUserResponse(
+                user.getId(),
+                user.getEmail(),
+                user.getStatus()
+        );
     }
 }

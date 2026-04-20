@@ -1,6 +1,8 @@
 package com.roam.api.auth.service;
 
 import com.roam.api.auth.dto.AuthTokensResponse;
+import com.roam.api.auth.exception.InvalidOtpException;
+import com.roam.api.auth.exception.InvalidRefreshTokenException;
 import com.roam.api.auth.token.IssuedRefreshToken;
 import com.roam.api.security.jwt.JwtService;
 import com.roam.api.user.entity.User;
@@ -20,7 +22,7 @@ public class AuthService {
         emailOtpService.requestOtp(email);
     }
 
-    @Transactional
+    @Transactional(noRollbackFor = InvalidOtpException.class)
     public AuthTokensResponse verifyEmailOtp(
             String email,
             String otpCode,
@@ -45,7 +47,7 @@ public class AuthService {
         );
     }
 
-    @Transactional
+    @Transactional(noRollbackFor = InvalidRefreshTokenException.class)
     public AuthTokensResponse refreshToken(String refreshToken) {
         IssuedRefreshToken issuedRefreshToken = refreshTokenService.rotateToken(refreshToken);
 

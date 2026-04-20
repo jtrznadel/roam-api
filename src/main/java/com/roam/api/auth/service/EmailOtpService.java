@@ -56,7 +56,7 @@ public class EmailOtpService {
         emailSender.sendOtpCode(normalizedEmail, otpCode);
     }
 
-    @Transactional(noRollbackFor = InvalidOtpException.class)
+    @Transactional()
     public User verifyOtp(String email, String otpCode) {
         String normalizedEmail = normalizeEmail(email);
         Instant now = Instant.now(clock);

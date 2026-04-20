@@ -68,7 +68,7 @@ public class RefreshTokenService {
         return new IssuedRefreshToken(issued.token(), issued.userId());
     }
 
-    @Transactional(noRollbackFor = InvalidRefreshTokenException.class)
+    @Transactional()
     public IssuedRefreshToken rotateToken(String rawRefreshToken) {
         String tokenHash = refreshTokenHasher.hash(rawRefreshToken);
         Instant now = Instant.now(clock);

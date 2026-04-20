@@ -1,12 +1,15 @@
 package com.roam.api.common.exception;
 
 import com.roam.api.common.response.ApiErrorResponse;
+import com.roam.api.common.response.FieldErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.List;
 
 @Slf4j
 @RestControllerAdvice
@@ -23,12 +26,23 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiErrorResponse> handleValidationException() {
+    public ResponseEntity<ApiErrorResponse> handleValidationException(MethodArgumentNotValidException exception) {
+
+        List<FieldErrorResponse> errors = exception.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(error -> new FieldErrorResponse(
+                        error.getField(),
+                        error.getDefaultMessage()
+                ))
+                .toList();
+
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(new ApiErrorResponse(
                         ErrorCode.VALIDATION_FAILED.name(),
-                        "Request validation failed."
+                        "Request validation failed.",
+                        errors
                 ));
     }
 

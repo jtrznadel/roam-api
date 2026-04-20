@@ -37,7 +37,10 @@ public class User {
     private Instant lastLoginAt;
 
     @Column(name = "deleted_at")
-    private Instant deletedAd;
+    private Instant deletedAt;
+
+    @Column(name = "onboarding_completed", nullable = false)
+    private boolean onboardingCompleted;
 
     public static User create(String email, Instant now) {
         User user = new User();
@@ -47,11 +50,17 @@ public class User {
         user.emailVerifiedAt = now;
         user.createdAt = now;
         user.updatedAt = now;
+        user.onboardingCompleted = false;
         return user;
     }
 
     public void recordLogin(Instant now) {
         this.lastLoginAt = now;
+        this.updatedAt = now;
+    }
+
+    public void completeOnboarding(Instant now) {
+        this.onboardingCompleted = true;
         this.updatedAt = now;
     }
 }

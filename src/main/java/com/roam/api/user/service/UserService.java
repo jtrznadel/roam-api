@@ -36,6 +36,14 @@ public class UserService {
                 .orElseThrow(UserNotFoundException::new);
     }
 
+    @Transactional
+    public User completeOnboarding(UUID userId) {
+        User user = getById(userId);
+
+        user.completeOnboarding(Instant.now(clock));
+        return user;
+    }
+
     private String normalizeEmail(String email) {
         return email.trim().toLowerCase(Locale.ROOT);
     }

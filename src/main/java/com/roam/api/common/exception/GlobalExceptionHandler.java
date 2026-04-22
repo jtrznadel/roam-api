@@ -65,7 +65,8 @@ public class GlobalExceptionHandler {
             case INTERNAL_ERROR -> HttpStatus.INTERNAL_SERVER_ERROR;
             case OTP_RESEND_TOO_SOON -> HttpStatus.TOO_MANY_REQUESTS;
             case INVALID_REFRESH_TOKEN, UNAUTHORIZED -> HttpStatus.UNAUTHORIZED;
-            case USER_NOT_FOUND -> HttpStatus.NOT_FOUND;
+            case USER_NOT_FOUND, PROFILE_NOT_FOUND -> HttpStatus.NOT_FOUND;
+            case USERNAME_ALREADY_TAKEN -> HttpStatus.CONFLICT;
         };
     }
 }

@@ -8,6 +8,7 @@ public record CurrentUserResponse(
         UUID id,
         String email,
         UserStatus status,
-        boolean onboardingCompleted
+        boolean onboardingCompleted,
+        boolean profileSetupCompleted
 ) {
 }

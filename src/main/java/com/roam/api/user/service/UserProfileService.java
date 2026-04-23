@@ -107,6 +107,15 @@ public class UserProfileService {
 
     }
 
+    @Transactional(readOnly = true)
+    public void ensureUsernameAvailableForUser(UUID userId, String username) {
+        String normalizedUsername = username.trim().toLowerCase(Locale.ROOT);
+
+        if (userProfileRepository.existsByUsernameIgnoreCaseAndUserIdNot(normalizedUsername, userId)) {
+            throw new UsernameAlreadyTakenException();
+        }
+    }
+
     private String normalizeOptionalValue(String value) {
         if (value == null) {
             return null;

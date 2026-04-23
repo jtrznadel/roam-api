@@ -4,6 +4,7 @@ import com.roam.api.security.CurrentUserPrincipal;
 import com.roam.api.user.dto.CompleteProfileSetupRequest;
 import com.roam.api.user.dto.CurrentUserProfileResponse;
 import com.roam.api.user.dto.CurrentUserResponse;
+import com.roam.api.user.dto.UpdateCurrentUserProfileRequest;
 import com.roam.api.user.entity.User;
 import com.roam.api.user.entity.UserProfile;
 import com.roam.api.user.mapper.UserMapper;
@@ -60,6 +61,19 @@ public class MeController {
             @Valid @RequestBody CompleteProfileSetupRequest request
     ) {
         UserProfile userProfile = userProfileService.completeProfileSetup(
+                currentUser.userId(),
+                request
+        );
+
+        return userProfileMapper.toResponse(userProfile);
+    }
+
+    @PatchMapping("/api/v1/me/profile")
+    public CurrentUserProfileResponse updateProfile(
+            @AuthenticationPrincipal CurrentUserPrincipal currentUser,
+            @Valid @RequestBody UpdateCurrentUserProfileRequest request
+    ) {
+        UserProfile userProfile = userProfileService.updateCurrentUserProfile(
                 currentUser.userId(),
                 request
         );

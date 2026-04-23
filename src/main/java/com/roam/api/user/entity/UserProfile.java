@@ -74,5 +74,29 @@ public class UserProfile {
 
     }
 
+    public void updateDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
+
+    public void updateAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
+    }
+
+    public void updateBio(String bio) {
+        this.bio = bio;
+    }
+
+    public void clearAvatarUrl() {
+        this.avatarUrl = null;
+    }
+
+    public void clearBio() {
+        this.bio = null;
+    }
+
+    public void touch(Instant now) {
+        this.updatedAt = now;
+    }
+
 
 }

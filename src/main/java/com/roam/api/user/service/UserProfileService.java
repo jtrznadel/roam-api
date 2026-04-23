@@ -1,8 +1,10 @@
 package com.roam.api.user.service;
 
 import com.roam.api.user.dto.CompleteProfileSetupRequest;
+import com.roam.api.user.dto.UpdateCurrentUserProfileRequest;
 import com.roam.api.user.entity.User;
 import com.roam.api.user.entity.UserProfile;
+import com.roam.api.user.exception.InvalidProfileStateException;
 import com.roam.api.user.exception.ProfileNotFoundException;
 import com.roam.api.user.exception.UserNotFoundException;
 import com.roam.api.user.exception.UsernameAlreadyTakenException;
@@ -54,6 +56,55 @@ public class UserProfileService {
         user.completeProfileSetup(now);
 
         return profile;
+    }
+
+    @Transactional
+    public UserProfile updateCurrentUserProfile(UUID userId, UpdateCurrentUserProfileRequest request) {
+        UserProfile profile = getByUserId(userId);
+
+        boolean changed = false;
+
+        if (request.displayName() != null) {
+            String displayName = request.displayName().trim();
+
+            if (displayName.isEmpty()) {
+                throw new InvalidProfileStateException("Display name must not be blank");
+            }
+
+            profile.updateDisplayName(displayName);
+            changed = true;
+        }
+
+        if (request.avatarUrl() != null) {
+            String avatarUrl = normalizeOptionalValue(request.avatarUrl());
+
+            if (avatarUrl == null) {
+                profile.clearAvatarUrl();
+            } else {
+                profile.updateAvatarUrl(avatarUrl);
+            }
+
+            changed = true;
+        }
+
+        if (request.bio() != null) {
+            String bio = normalizeOptionalValue(request.bio());
+
+            if (bio == null) {
+                profile.clearBio();
+            } else {
+                profile.updateBio(bio);
+            }
+
+            changed = true;
+        }
+
+        if (changed) {
+            profile.touch(Instant.now(clock));
+        }
+
+        return profile;
+
     }
 
     private String normalizeOptionalValue(String value) {

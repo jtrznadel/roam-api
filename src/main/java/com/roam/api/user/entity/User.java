@@ -42,6 +42,9 @@ public class User {
     @Column(name = "onboarding_completed", nullable = false)
     private boolean onboardingCompleted;
 
+    @Column(name = "profile_setup_completed", nullable = false)
+    private boolean profileSetupCompleted;
+
     public static User create(String email, Instant now) {
         User user = new User();
         user.id = UUID.randomUUID();
@@ -51,6 +54,7 @@ public class User {
         user.createdAt = now;
         user.updatedAt = now;
         user.onboardingCompleted = false;
+        user.profileSetupCompleted = false;
         return user;
     }
 
@@ -61,6 +65,11 @@ public class User {
 
     public void completeOnboarding(Instant now) {
         this.onboardingCompleted = true;
+        this.updatedAt = now;
+    }
+
+    public void completeProfileSetup(Instant now) {
+        this.profileSetupCompleted = true;
         this.updatedAt = now;
     }
 }

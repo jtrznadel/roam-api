@@ -16,6 +16,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final UserProfileBootstrapService userProfileBootstrapService;
+
     private final Clock clock;
 
     @Transactional
@@ -27,7 +29,12 @@ public class UserService {
                 .map(user -> {
                     user.recordLogin(now);
                     return user;
-                }).orElseGet(() -> userRepository.save(User.create(normalizedEmail, now)));
+                })
+                .orElseGet(() -> {
+                    User user = userRepository.save(User.create(normalizedEmail, now));
+                    userProfileBootstrapService.createDefaultProfile(user);
+                    return user;
+                });
     }
 
     @Transactional(readOnly = true)
